@@ -16,6 +16,20 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@my-common": [
+        "./src/common"
+      ],
+      "@my-environment": [
+        "./src/environment"
+      ],
+      "@my-interfaces": [
+        "./src/interface"
+      ],
+      "@my-interfaces/*": [
+        "./src/interface/*"
+      ]
+    }
   }
 }
