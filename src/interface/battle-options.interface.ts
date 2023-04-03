@@ -1,10 +1,15 @@
-import { BattleFieldOptions, PixelApiOptions } from '@bottle/pixel/interface';
 import { ModuleMetadata, Type } from '@nestjs/common';
+import {
+  BattleFieldOptions,
+  PixelApiOptions,
+  TemplateFieldOptions,
+} from '@bottle/pixel/interface';
 
 export interface BattleModuleOptions {
   // token: string;
   optionsPixelApi: PixelApiOptions;
   optionsBattleField: BattleFieldOptions;
+  optionsTemplateField: TemplateFieldOptions;
 }
 
 export interface BattleOptionsFactory {

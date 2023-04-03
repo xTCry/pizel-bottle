@@ -1,13 +1,19 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
-import { PixelApi, TemplateField } from '@bottle/pixel';
+import { BattleField, PixelApi, TemplateField } from '@bottle/pixel';
 
-import { InjectPixelApi, InjectTemplateField } from '@my-common/decorators';
+import {
+  InjectBattleField,
+  InjectPixelApi,
+  InjectTemplateField,
+} from '@my-common/decorators';
 
 @Injectable()
 export class BattleService implements OnApplicationBootstrap {
   protected readonly logger = new Logger(this.constructor.name);
 
   constructor(
+    @InjectBattleField()
+    private readonly battleField: BattleField,
     @InjectTemplateField()
     private readonly templateField: TemplateField,
     @InjectPixelApi()
@@ -21,7 +27,10 @@ export class BattleService implements OnApplicationBootstrap {
   }
 
   private async init() {
-    // this.templateField
-    // ...
+    try {
+      await this.templateField.loadTemplateField();
+    } catch (err) {
+      this.logger.error(err);
+    }
   }
 }

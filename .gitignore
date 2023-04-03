@@ -37,4 +37,7 @@ lerna-debug.log*
 .env*
 !.env.example
 
+/dataset/*
+!/dataset/example.png
+
 !/**/.gitkeep

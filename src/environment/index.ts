@@ -14,6 +14,8 @@ export enum EnvType {
 export const NODE_ENV: EnvType =
   (process.env.NODE_ENV as EnvType) || EnvType.DEV;
 
+export const LOG_PATH: string = process.env.LOG_PATH || './logs/';
+
 // * Application
 export const SERVER_PORT: number = +process.env.SERVER_PORT || 3000;
 export const DOMAIN: string = process.env.DOMAIN || '127.0.0.1';

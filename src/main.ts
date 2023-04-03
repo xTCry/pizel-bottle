@@ -3,8 +3,11 @@ import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 
 import * as xEnv from '@my-environment';
 import { HttpExceptionFilter } from '@my-common';
+import { setErrorListener } from '@my-common/utils/logger.util';
 
 import { AppModule } from './models/app/app.module';
+
+setErrorListener();
 
 async function bootstrap() {
   Logger.log(

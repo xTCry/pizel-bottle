@@ -8,6 +8,7 @@ import { TemplateField } from '@bottle/pixel';
 
 export const templateFieldProvider: Provider = {
   provide: PIZEL_BOTTLE_TEMPLATE_FIELD,
-  useFactory: (options: BattleModuleOptions) => new TemplateField(),
+  useFactory: (options: BattleModuleOptions) =>
+    new TemplateField(options.optionsBattleField),
   inject: [PIZEL_BOTTLE_BATTLE_OPTIONS],
 };
