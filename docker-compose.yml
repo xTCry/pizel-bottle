@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  app_srv:
+    hostname: pizel-bottle-app
+    build:
+      context: .
+      target: base
+      dockerfile: ./Dockerfile
+    command: yarn start:dev
+    ports:
+      # 3000 is the default port
+      - ${SERVER_EXTERNAL_PORT:-3008}:${SERVER_PORT:-3000}
+    networks:
+      - pizel-bottle-net
+    volumes:
+      #### - .:/home/node/app
+      - ./.env:/home/node/app/.env
+      - ./logs:/home/node/app/logs
+      - /home/node/app/node_modules
+    healthcheck:
+      test: curl --fail http://localhost:${SERVER_PORT:-3000}/api/ping || exit 1
+      interval: 2m
+      retries: 3
+      start_period: 40s
+      timeout: 10s
+    restart: unless-stopped
+    stdin_open: true # docker run -i
+    tty: true # docker run -t
+
+networks:
+  pizel-bottle-net:
+    driver: bridge
