@@ -21,6 +21,9 @@
       "@my-common": [
         "./src/common"
       ],
+      "@my-common/*": [
+        "./src/common/*"
+      ],
       "@my-environment": [
         "./src/environment"
       ],
@@ -30,10 +33,10 @@
       "@my-interfaces/*": [
         "./src/interface/*"
       ],
-      "bottle/pixel": [
+      "@bottle/pixel": [
         "libs/pixel/src"
       ],
-      "bottle/pixel/*": [
+      "@bottle/pixel/*": [
         "libs/pixel/src/*"
       ]
     }

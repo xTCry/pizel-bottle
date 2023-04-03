@@ -1,2 +1,3 @@
-export * from './pixel.module';
-export * from './pixel.service';
+export * from './battle-field.class';
+export * from './pixel-api.class';
+export * from './template-field.class';

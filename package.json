@@ -85,7 +85,7 @@
       "<rootDir>/libs/"
     ],
     "moduleNameMapper": {
-      "^bottle/pixel(|/.*)$": "<rootDir>/libs/pixel/src/$1"
+      "^@bottle/pixel(|/.*)$": "<rootDir>/libs/pixel/src/$1"
     }
   }
 }

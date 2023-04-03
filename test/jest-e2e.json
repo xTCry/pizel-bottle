@@ -14,7 +14,7 @@
     "^@my-common(.*)$": "<rootDir>/../src/common$1",
     "^@my-environment(.*)$": "<rootDir>/../src/environment$1",
     "^@my-interfaces(.*)$": "<rootDir>/../src/interface$1",
-    "bottle/pixel/(.*)": "<rootDir>/../libs/pixel/src/$1",
-    "bottle/pixel": "<rootDir>/../libs/pixel/src"
+    "@bottle/pixel/(.*)": "<rootDir>/../libs/pixel/src/$1",
+    "@bottle/pixel": "<rootDir>/../libs/pixel/src"
   }
 }
