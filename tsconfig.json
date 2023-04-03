@@ -29,6 +29,12 @@
       ],
       "@my-interfaces/*": [
         "./src/interface/*"
+      ],
+      "bottle/pixel": [
+        "libs/pixel/src"
+      ],
+      "bottle/pixel/*": [
+        "libs/pixel/src/*"
       ]
     }
   }
