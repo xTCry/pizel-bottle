@@ -406,14 +406,16 @@ export class PixelSocket {
       this.log.error('sendPixel error', err);
     }
 
+    // TODO: отключаться от сокета на минуту?
+
     if (this.battleField.options.healthCheckActive !== false) {
-      this.battleField.watchPixel(pixel, this.warrior.userId);
-      setTimeout(() => {
+      const watcherTimer = setTimeout(() => {
         // Могут быть миссклики, когда область хорошо обороняют
         if (!this.battleField.pingPixel(pixel)) {
           ++this.missesCounter;
           this.log.debug('I am alive? (Pixel not ping)', this.missesCounter);
-          this.battleField.unsetPixel(pixel);
+          // this.battleField.unsetPixel(pixel);
+          this.battleField.unsetTempPixel(pixel);
 
           if (this.missesCounter > 6) {
             this.log.error('Warrior resigned');
@@ -421,19 +423,22 @@ export class PixelSocket {
             return;
           }
 
-          if (true) {
+          if (!true) {
+            // Лучше не сбрасывать,
+            // т.к. при попытке поставить пиксель при идущем таймере - дисконнект
             this.resetWait();
           }
         } else if (this.missesCounter > 0) {
           this.missesCounter -= 2;
         }
       }, 10e3);
+      this.battleField.watchPixel(pixel, watcherTimer);
     }
 
     if (pixel.flag === PixelFlag.BOMB) {
       for (const pxl of Pixel.createExplode(pixel.x, pixel.y, {})) {
         if (!this.battleField.isFreeze(pxl.x, pxl.y)) {
-          this.battleField.drawPixel(pxl);
+          this.battleField.addTempPixel(pxl);
         }
       }
     } else if (pixel.flag === PixelFlag.FREZE) {
@@ -444,7 +449,7 @@ export class PixelSocket {
       }
       this.battleField.setTimerForUpdateFreeze(timeToFreez);
     } else {
-      this.battleField.drawPixel(pixel);
+      this.battleField.addTempPixel(pixel);
     }
   }
 

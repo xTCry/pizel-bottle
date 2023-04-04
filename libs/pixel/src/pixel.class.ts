@@ -336,7 +336,12 @@ export class Pixel {
    * Чтоыб убедиться в том, что нужный пиксель вернулся с сервера
    */
   public get hash4watch(): string {
-    return this.hashWithColor;
+    return hash({
+      x: this.x,
+      y: this.y,
+      colorId: this.colorId,
+      userId: this.userId,
+    });
   }
 
   public get hashWithColor(): string {

@@ -20,7 +20,7 @@ export class BattleField {
   /**
    * Набор наблюдаемых пикселей, которые ставят воины.
    */
-  private watchedPixels: Map<Pixel['hash4watch'], number> = new Map();
+  private watchedPixels: Map<Pixel['hash4watch'], NodeJS.Timeout> = new Map();
 
   /**
    * Набор воинов (аккаунтов)
@@ -36,6 +36,11 @@ export class BattleField {
    * Текущие изменения всего поля получаемые через WebSocket
    */
   public mainCanvas: Record<number, number> = {};
+
+  /**
+   * Локальные изменения. Отправляем на сервер и ждет подтверждения
+   */
+  public tempCanvas: Record<number, number> = {};
 
   // /**
   //  * Цвета со смещениями (позиции пикселей) отрисовываемого полотна
@@ -118,6 +123,7 @@ export class BattleField {
         for (const pixel of pixels) {
           if (
             this.mainCanvas[pixel.offset] === pixel.colorId ||
+            this.tempCanvas[pixel.offset] === pixel.colorId ||
             this.isFreeze(pixel.x, pixel.y)
           ) {
             continue;
@@ -132,9 +138,8 @@ export class BattleField {
 
           warrior.pixelSocket.sendPixel(pixel);
           warrior.logger.debug('Try draw', pixel.toString());
-          this.mainCanvas[pixel.offset] = pixel.colorId;
 
-          await delay(50);
+          await delay(90 + 10 * Math.random());
         }
       } catch (err) {
         this.logger.error(err);
@@ -319,10 +324,13 @@ export class BattleField {
   public onNewPixel(pixel: Pixel) {
     const pixelHash = pixel.hash4watch;
     if (this.watchedPixels.has(pixelHash)) {
-      this.warriors
-        .get(this.watchedPixels.get(pixelHash))
-        .logger.debug('[Pixel] Pinged', pixel.toString());
+      const watcherTimer = this.watchedPixels.get(pixelHash);
+      clearTimeout(watcherTimer);
       this.watchedPixels.delete(pixelHash);
+
+      this.warriors
+        .get(pixel.userId)
+        .logger.debug('[Pixel] Pinged', pixel.toString());
     }
 
     if (this.isFreeze(pixel.x, pixel.y)) {
@@ -353,10 +361,15 @@ export class BattleField {
     }
   }
 
-  public watchPixel(pixel: Pixel, userId: number) {
-    this.watchedPixels.set(pixel.hash4watch, userId);
+  public watchPixel(pixel: Pixel, watcherTimer: NodeJS.Timeout) {
+    this.watchedPixels.set(pixel.hash4watch, watcherTimer);
   }
 
+  /**
+   * Если таймаут был достигнут, то очищаем ждуна
+   *
+   * @returns boolean Вернет `false`, если пиксель до сих пор в ожидании, иначе `true`
+   */
   public pingPixel(pixel: Pixel) {
     const pixelHash = pixel.hash4watch;
     if (this.watchedPixels.has(pixelHash)) {
@@ -372,6 +385,14 @@ export class BattleField {
 
   public unsetPixel(pixel: Pixel) {
     this.mainCanvas[pixel.offset] = -1;
+  }
+
+  public addTempPixel(pixel: Pixel) {
+    this.tempCanvas[pixel.offset] = pixel.colorId;
+  }
+
+  public unsetTempPixel(pixel: Pixel) {
+    this.tempCanvas[pixel.offset] = -1;
   }
 
   /**
