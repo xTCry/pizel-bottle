@@ -383,7 +383,7 @@ export class PixelSocket {
       let buff = new ArrayBuffer(4);
       new Int32Array(buff, 0, 1)[0] = pixel.pack();
       this.ws.send(buff);
-      this.log.debug('WS send: ', pixel.toString());
+      // this.log.debug('WS send: ', pixel.toString());
       this.onlineWait = Date.now() + this.onlineTtl;
       this.resetAliveTimer();
     } catch (err) {

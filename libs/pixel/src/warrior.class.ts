@@ -68,7 +68,7 @@ export class Warrior {
       );
       let { url, data, deadline } = response;
 
-      this.logger.debug('Response server URL:', JSON.stringify(url));
+      // this.logger.debug('Response server URL:', JSON.stringify(url));
 
       /* or only main */
       this.battleField.dataUrl = data;

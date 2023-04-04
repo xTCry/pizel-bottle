@@ -308,12 +308,6 @@ export class BattleField {
       this.watchedPixels.delete(pixelHash);
     }
 
-    // ! TEST
-    if (pixel.x > 1585 && pixel.x < 1588 && pixel.y > 394 && pixel.y < 398) {
-      this.logger.debug('TRIGGER', pixel.toString());
-    }
-    // ! TEST
-
     if (this.isFreeze(pixel.x, pixel.y)) {
       if (!this.freezeOverdraw[pixel.offset]) {
         this.freezeOverdraw[pixel.offset] = [];
