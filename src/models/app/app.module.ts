@@ -18,8 +18,8 @@ import { AppService } from './app.service';
           optionsBattleField: {
             logger: createNestLogger('BattleField'),
             warriorLogger: createNestLogger('Warrior'),
-            logOnlineToConsole: true,
-            healthCheckActive: true,
+            logOnlineToConsole: xEnv.USE_LOGGING_ONLINE,
+            healthCheckActive: xEnv.USE_HEALTH_CHECK,
           },
           optionsTemplateField: {
             logger: createNestLogger('TemplateField'),

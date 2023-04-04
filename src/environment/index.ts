@@ -35,3 +35,11 @@ export const USE_SMART_COLOR_SEARCH: boolean = process.env
   .USE_SMART_COLOR_SEARCH
   ? process.env.USE_SMART_COLOR_SEARCH === 'true'
   : false;
+
+export const USE_LOGGING_ONLINE: boolean = process.env.USE_LOGGING_ONLINE
+  ? process.env.USE_LOGGING_ONLINE === 'true'
+  : false;
+
+export const USE_HEALTH_CHECK: boolean = process.env.USE_HEALTH_CHECK
+  ? process.env.USE_HEALTH_CHECK === 'true'
+  : false;
