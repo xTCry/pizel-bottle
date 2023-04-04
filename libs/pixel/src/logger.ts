@@ -16,6 +16,7 @@ import { Logger, WithLoggerType } from './interface/logger.interface';
 const noopLogger: Logger = {
   info: () => {},
   warn: () => {},
+  debug: () => {},
   error: () => {},
 };
 

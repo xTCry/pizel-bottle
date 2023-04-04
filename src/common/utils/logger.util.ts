@@ -1,4 +1,3 @@
-import * as Fs from 'fs-extra';
 import * as ololog from 'ololog';
 import * as ansi from 'ansicolor';
 import * as RFS from 'rotating-file-stream';
@@ -171,12 +170,9 @@ export const sololog = ololog
 export const createNestLogger = (context: string) => {
   // TODO: improve it
 
-  const contextLimit = 13;
+  const contextLimit = 0; /* 16 */
   const logger = sololog.yellow.configure({
     locate: false /* customLocator */,
-    time: {
-      yes: true,
-    },
     'time+': (lines: string[]) => {
       const appName = 'Nest';
       const pidMessage = /* levelColor[level] */ (
@@ -196,11 +192,14 @@ export const createNestLogger = (context: string) => {
     },
   });
 
-  return {
-    info: (e, ...p) => logger.info(e, ...p),
-    warn: (e, ...p) => logger.warn(e, ...p),
-    error: (e, ...p) => logger.error(e, ...p),
-  } as LoggerType;
+  // return {
+  //   info: logger.info.bind(logger),
+  //   warn: logger.warn.bind(logger),
+  //   debug: logger.debug.bind(logger),
+  //   error: logger.error.bind(logger),
+  // } as LoggerType;
+
+  return logger as LoggerType;
 };
 
 export const setErrorListener = () => {

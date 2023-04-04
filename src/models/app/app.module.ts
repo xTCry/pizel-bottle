@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import * as xEnv from '@my-environment';
 import { createNestLogger } from '@my-common/utils/logger.util';
 
 import { BattleModule } from '../battle/battle.module';
@@ -12,16 +13,18 @@ import { AppService } from './app.service';
         return {
           optionsPixelApi: {
             logger: createNestLogger('PixelApi'),
-            embedUrl: 'helloW',
-            // ...
+            apiUrl: xEnv.PIXEL_BATTLE_API_URL,
           },
           optionsBattleField: {
             logger: createNestLogger('BattleField'),
-            // ...
+            warriorLogger: createNestLogger('Warrior'),
+            logOnlineToConsole: true,
+            healthCheckActive: true,
           },
           optionsTemplateField: {
             logger: createNestLogger('TemplateField'),
-            // ...
+            urlToImage: xEnv.TEMPLATE_IMAGE,
+            smartColorSearch: xEnv.USE_SMART_COLOR_SEARCH,
           },
         };
       },

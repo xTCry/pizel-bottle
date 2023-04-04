@@ -27,8 +27,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     let error: string;
     let payload: any;
-    if (typeof expResponse !== 'string') {
+    let validation: any;
+    if (expResponse && typeof expResponse !== 'string') {
       payload = expResponse.payload;
+      validation = expResponse.validation;
       error ??= expResponse.error;
     }
     error ??= exception.name;
@@ -40,6 +42,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         error,
         timestamp: new Date().toISOString(),
         payload,
+        validation,
       },
     });
   }

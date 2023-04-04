@@ -1,8 +1,8 @@
 import { NestFactory } from '@nestjs/core';
-import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
+import { Logger, VersioningType } from '@nestjs/common';
 
 import * as xEnv from '@my-environment';
-import { HttpExceptionFilter } from '@my-common';
+import { HttpExceptionFilter, ValidationHttpPipe } from '@my-common';
 import { setErrorListener } from '@my-common/utils/logger.util';
 
 import { AppModule } from './models/app/app.module';
@@ -24,7 +24,7 @@ async function bootstrap() {
   });
 
   app.useGlobalPipes(
-    new ValidationPipe({
+    new ValidationHttpPipe({
       transform: true,
       disableErrorMessages: false,
     }),

@@ -12,24 +12,25 @@ import {
 } from '@my-interfaces/battle-options.interface';
 import {
   battleFieldProvider,
-  pixelApiProvider,
   templateFieldProvider,
 } from '@my-common/providers';
 import { PIZEL_BOTTLE_BATTLE_OPTIONS } from '@my-common';
 
 import { BattleService } from './battle.service';
+import { BattleController } from './battle.controller';
 
 @Global()
 @Module({
   imports: [],
+  controllers: [BattleController],
   providers: [BattleService],
 })
 export class BattleModule implements OnApplicationShutdown {
   public static forRootAsync(options: BattleModuleAsyncOptions): DynamicModule {
     const providers = [
       battleFieldProvider,
-      pixelApiProvider,
       templateFieldProvider,
+      //
     ];
 
     const asyncProviders = this.createAsyncProviders(options);

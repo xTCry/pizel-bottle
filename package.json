@@ -30,6 +30,7 @@
     "@nestjs/core": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
     "ansicolor": "^1.1.100",
+    "axios": "^1.3.4",
     "canvas": "^2.11.2",
     "chokidar": "^3.5.3",
     "class-transformer": "^0.5.1",
@@ -37,6 +38,7 @@
     "dotenv": "^16.0.3",
     "dotenv-expand": "^10.0.0",
     "fs-extra": "^11.1.1",
+    "object-hash": "^3.0.0",
     "ololog": "^1.1.175",
     "printable-characters": "^1.0.42",
     "reflect-metadata": "^0.1.13",
@@ -45,7 +47,9 @@
     "rxjs": "^7.2.0",
     "stacktracey": "^2.1.8",
     "string.bullet": "^1.0.12",
-    "string.ify": "^1.0.64"
+    "string.ify": "^1.0.64",
+    "tiny-typed-emitter": "^2.1.0",
+    "ws": "^8.13.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.5.1",
@@ -58,6 +62,7 @@
     "@types/jest": "28.1.4",
     "@types/node": "^16.0.0",
     "@types/supertest": "^2.0.11",
+    "@types/ws": "^8.5.4",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
     "eslint": "^8.0.1",

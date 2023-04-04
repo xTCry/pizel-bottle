@@ -24,3 +24,14 @@ export const API_URL: string =
 export const USE_LOCALHOST: boolean = process.env.USE_LOCALHOST
   ? process.env.USE_LOCALHOST === 'true'
   : false;
+
+export const PIXEL_BATTLE_API_URL: string =
+  process.env.PIXEL_BATTLE_API_URL || 'https://pixel-dev.w84.vkforms.ru';
+
+export const TEMPLATE_IMAGE: string =
+  process.env.TEMPLATE_IMAGE || './dataset/template.png';
+
+export const USE_SMART_COLOR_SEARCH: boolean = process.env
+  .USE_SMART_COLOR_SEARCH
+  ? process.env.USE_SMART_COLOR_SEARCH === 'true'
+  : false;

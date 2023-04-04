@@ -1,5 +1,6 @@
 import * as Fs from 'fs-extra';
 import * as Path from 'path';
+import { TypedEmitter } from 'tiny-typed-emitter';
 import * as chokidar from 'chokidar';
 import { Canvas, createCanvas, loadImage } from 'canvas';
 
@@ -7,22 +8,27 @@ import { LoadingState } from './constants';
 import { Logger, TemplateFieldOptions } from './interface';
 import { getLogger } from './logger';
 import { Pixel } from './pixel.class';
+import { findClosestColor } from './tools';
 
-export class TemplateField {
-  public loadingState = LoadingState.NONE;
-  public path2file = './dataset/template.png';
+interface TemplateFieldEvents {
+  pixels: (
+    /* arPixels: Pixel[], */ templatePixels: Record<number, Pixel>,
+  ) => void;
+}
 
-  private cooldownTimestamp: number = 0;
-
+export class TemplateField extends TypedEmitter<TemplateFieldEvents> {
   protected readonly logger: Logger;
 
-  constructor(options: TemplateFieldOptions) {
+  private cooldownTimestamp: number = 0;
+  public loadingState = LoadingState.NONE;
+  public lastImageUrl: string = this.options.urlToImage;
+
+  constructor(protected readonly options: TemplateFieldOptions) {
+    super();
     this.logger = getLogger(options);
   }
 
-  public async loadTemplateField(url2Image?: string) {
-    // url2Image ??= config.get('IMG_URL');
-
+  public async loadTemplateField(urlToImage: string = this.lastImageUrl) {
     if (
       Date.now() - this.cooldownTimestamp <= 10 * 1e3 ||
       this.loadingState === LoadingState.LOADING
@@ -33,26 +39,26 @@ export class TemplateField {
     this.cooldownTimestamp = Date.now();
     this.loadingState = LoadingState.LOADING;
 
-    // Загружаемое изображение
     const canvas: Canvas = createCanvas(Pixel.MAX_WIDTH, Pixel.MAX_HEIGHT);
     const ctx = canvas.getContext('2d');
 
     let src: string | Buffer = null;
 
     try {
-      if (url2Image) {
-        src = `${url2Image}?r=${new Date().getTime()}`;
-      } else if (await Fs.exists(this.path2file)) {
-        src = await Fs.readFile(this.path2file);
+      if (urlToImage.startsWith('http')) {
+        src = `${urlToImage}?r=${new Date().getTime()}`;
+      } else if (await Fs.exists(urlToImage)) {
+        src = await Fs.readFile(urlToImage);
         this.logger.info('Try load saved drawn file...');
       }
 
       if (!src) {
         throw new Error(
-          `Source image has not been empty! Try save new image to ${this.path2file}`,
+          `Source image has not been empty! Try save new image to '${'./dataset/template.png'}'`,
         );
       }
 
+      this.lastImageUrl = urlToImage;
       const resultImg = await loadImage(src, {
         timeout: 180e3,
       });
@@ -69,24 +75,56 @@ export class TemplateField {
 
       this.logger.info(`Template field size: ${img.length} pixels`);
 
-      let arPixels = [];
+      const arPixels: Pixel[] = [];
+      const templatePixels: Record<number, Pixel> = {};
+
       for (let i = 0; i < img.length; i += 4) {
         // Skip Alpha channel
         if (img[i + 3] === 0) {
           continue;
         }
+
+        const x = ((i / 4) % width);// + 1;
+        const y = ~~(i / 4 / width);// + 1;
+        const rgbAr = [img[i + 0], img[i + 1], img[i + 2]] as [
+          number,
+          number,
+          number,
+        ];
+        const importance = img[i + 3];
+
+        let colorId: number;
+        if (this.options.smartColorSearch) {
+          // * Поиск приблизительнго цвета
+          const colorAr = findClosestColor(rgbAr, Pixel.colorMapByteArray);
+          colorId = Pixel.findColorIdByColor(colorAr);
+        } else {
+          colorId = Pixel.findColorIdByColor(rgbAr);
+        }
+
+        const pixel = Pixel.create({
+          x,
+          y,
+          colorId,
+          importance,
+        });
+
+        if (pixel.isValid()) {
+          arPixels.push(pixel);
+          templatePixels[pixel.offset] = pixel /* .colorId */;
+        }
       }
 
       this.logger.info(`Loaded ${arPixels.length} pixels`);
-      // BattleField.arPixels = arPixels;
-
-      this.loadingState = LoadingState.LOADED;
-      return true;
-    } catch (error) {
-      this.logger.error('Load drawn image failed', error);
+      this.emit('pixels', /* arPixels, */ templatePixels);
+    } catch (err) {
+      this.logger.error('Load drawn image failed', err);
       this.loadingState = LoadingState.ERROR;
+      return false;
     }
-    return false;
+
+    this.loadingState = LoadingState.LOADED;
+    return true;
   }
 
   public watchFolder(folder: string) {
@@ -95,7 +133,11 @@ export class TemplateField {
 
       const watcher = chokidar.watch(folder, { persistent: true });
       watcher.on('change', async (filePath) => {
-        if (Path.basename(filePath) === this.fileName) {
+        if (
+          this.lastImageUrl &&
+          !this.lastImageUrl.startsWith('http') &&
+          Path.basename(filePath) === this.fileName
+        ) {
           this.logger.info(`${filePath} has been changed.`);
           this.loadTemplateField();
         }
@@ -106,6 +148,6 @@ export class TemplateField {
   }
 
   public get fileName(): string {
-    return Path.basename(this.path2file);
+    return Path.basename(this.lastImageUrl);
   }
 }

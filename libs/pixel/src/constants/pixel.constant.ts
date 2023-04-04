@@ -1,0 +1,42 @@
+export enum PixelFlag {
+  NONE = 0,
+  BOMB = 1,
+  FREZE = 2,
+  PIXEL = 3,
+  FREZE_CENTER = 4,
+  RELOAD_CHAT = 5,
+  BOMB_CENTER = 7,
+  PIXEL_START = 8,
+  FLAG_PIXEL = 9,
+}
+
+export type ColorId = number;
+
+export const colorIndexDecode = {
+  0: 0,
+  1: 1,
+  2: 2,
+  3: 3,
+  4: 4,
+  5: 5,
+  6: 6,
+  7: 7,
+  8: 8,
+  9: 9,
+  a: 10,
+  b: 11,
+  c: 12,
+  d: 13,
+  e: 14,
+  f: 15,
+  g: 16,
+  h: 17,
+  i: 18,
+  j: 19,
+  k: 20,
+  l: 21,
+  m: 22,
+  n: 23,
+  o: 24,
+  p: 25,
+};
