@@ -59,13 +59,20 @@ export class BattleController {
   async addWarrior(
     @Body() addWarrirDto: AddWarriorDto,
     @Query('sync', new DefaultValuePipe(true), ParseBoolPipe) sync: boolean,
+    @Query('save', new DefaultValuePipe(false), ParseBoolPipe) save: boolean,
   ) {
     const warriorAsync = this.battleField.addWarrior({
       embedUrl: addWarrirDto.embedUrl,
     });
 
     if (sync) {
-      warriorAsync.catch();
+      warriorAsync
+        .then(async (warrior) => {
+          if (save && warrior) {
+            await this.battleServiec.saveEmbeds([addWarrirDto.embedUrl]);
+          }
+        })
+        .catch();
       return { queue: true };
     }
 
@@ -77,6 +84,9 @@ export class BattleController {
         },
       };
     }
+    if (save) {
+      await this.battleServiec.saveEmbeds([addWarrirDto.embedUrl]);
+    }
 
     return { success: 1, userId: warrior.userId };
   }
@@ -86,6 +96,7 @@ export class BattleController {
   async addWarriors(
     @Body() addWarrirsDto: AddWarriorsDto,
     @Query('sync', new DefaultValuePipe(true), ParseBoolPipe) sync: boolean,
+    @Query('save', new DefaultValuePipe(false), ParseBoolPipe) save: boolean,
   ) {
     const warriorsAsync = Promise.all(
       addWarrirsDto.embedUrls.map((embedUrl) =>
@@ -94,7 +105,15 @@ export class BattleController {
     );
 
     if (sync) {
-      warriorsAsync.catch();
+      warriorsAsync
+        .then(async (warriors) => {
+          if (save) {
+            await this.battleServiec.saveEmbeds(
+              warriors.filter(Boolean).map((e) => e.embedUrl),
+            );
+          }
+        })
+        .catch();
       return { queue: true };
     }
 
@@ -112,6 +131,12 @@ export class BattleController {
         response.success++;
         response.userIds.push(warrior.userId);
       }
+    }
+
+    if (save) {
+      await this.battleServiec.saveEmbeds(
+        warriors.filter(Boolean).map((e) => e.embedUrl),
+      );
     }
 
     return response;

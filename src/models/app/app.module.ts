@@ -21,6 +21,7 @@ import { AppService } from './app.service';
             logOnlineToConsole: xEnv.USE_LOGGING_ONLINE,
             healthCheckActive: xEnv.USE_HEALTH_CHECK,
             autoUpdateField: xEnv.USE_AUTO_UPDATE_FIELD,
+            autoLoadEmbeds: xEnv.USE_AUTO_LOAD_EMBEDS,
           },
           optionsTemplateField: {
             logger: createNestLogger('TemplateField'),

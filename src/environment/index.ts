@@ -47,3 +47,7 @@ export const USE_HEALTH_CHECK: boolean = process.env.USE_HEALTH_CHECK
 export const USE_AUTO_UPDATE_FIELD: boolean = process.env.USE_AUTO_UPDATE_FIELD
   ? process.env.USE_AUTO_UPDATE_FIELD === 'true'
   : false;
+
+export const USE_AUTO_LOAD_EMBEDS: boolean = process.env.USE_AUTO_LOAD_EMBEDS
+  ? process.env.USE_AUTO_LOAD_EMBEDS === 'true'
+  : false;

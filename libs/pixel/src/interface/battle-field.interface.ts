@@ -5,4 +5,5 @@ export interface BattleFieldOptions extends WithLoggerType {
   healthCheckActive?: boolean;
   logOnlineToConsole?: boolean;
   autoUpdateField?: boolean;
+  autoLoadEmbeds?: boolean;
 }
