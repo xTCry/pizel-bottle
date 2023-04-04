@@ -1,26 +1,62 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
+  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="80" alt="Nest Logo" /></a>
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
+<p align="center">
+  <img src="https://img.shields.io/github/package-json/v/xTCry/pizel-bottle?style=flat-square" alt="GitHub package.json version"/>
+  <img src="https://img.shields.io/github/last-commit/xTCry/pizel-bottle?style=flat-square" alt="GitHub last commit"/>
 </p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+
+# [Pizel Bottle] Менеджер пиксельного боя
+
+> Простой Web-сервис с API интерфейсом для управления [Пиксельным Боем](https://vk.com/pixelbattle)
+
+---
+
+## Simple API
+
+- `{/api/v1/battle/stats, GET}` - Получить статистику подключений
+- `{/api/v1/battle/state, GET}` - Получить текущее состояние
+- `{/api/v1/battle/state/:state, POST}` - Установить состояние (state принимает: `1` - пауза, `2` - рисование)
+- `{/api/v1/battle/warrior, POST}` - Добавить бойца (body: `embed_url` - ссылка из iframe приложения)
+  - `sync=true` - ожидание успешной активации бойца, иначе добавление в очередь без ожидания ответа (по умолчанию `true`)
+  - `save=true` - сохранить ссылку в `embed.ini`
+- `{/api/v1/battle/warriors, POST}` - аналогично верхнему (body: `embed_url` - принимает множественное значение ссылок)
+- `{/api/v1/battle/template, POST}` - загрузить шаблон (body: `url` - ссылка на изображение или локальный путь на машине)
+- `{/api/v1/battle/field, GET}` - вывод текущего холста
+  - `template=true` - возвращает только шаблон рисования
+  - `overlay=true` - возвращает наложение шаблона рисования на текущее поле
+
+### API example
+
+- GET `http://[::1]:3000/api/v1/battle/field` - текущее поле
+- GET `{{API_URL}}/v1/battle/field?overlay=true` - текущее поле с наложением шаблона отрисовки
+- GET `{{API_URL}}/v1/battle/field?template=true` - чистое поле с шаблоном отрисовки
+- POST `{{API_URL}}/v1/battle/state/2` - запустить отрисовку
+- POST `{{API_URL}}/v1/battle/warriors?save=true` - добавление новых бойцов по embed ссылкам (ссылки сохранятся в файл)
+  - `embed_url[]:https://prod-app7148888-1c35ba98150c.pages-ac.vk-apps.com/index.html?vk_access_token_settings...`
+  - `embed_url[]:https://prod-app7148888-1c35ba98150c.pages-ac.vk-apps.com/index.html?vk_access_token_settings...`
+  ```json
+  {
+    "success": 2,
+    "fail": 0,
+    "userIds": [10123, 20987]
+  }
+  ```
+- GET `{{API_URL}}/v1/battle/stats` - получить тукщую статистику
+  ```json
+  {
+    "stats": {
+      "warriors": {
+        "total": 3,
+        "connected": 3,
+        "alive": 2
+      }
+    }
+  }
+  ```
+
+---
 
 ## Description
 
@@ -44,30 +80,3 @@ $ npm run start:dev
 # production mode
 $ npm run start:prod
 ```
-
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
