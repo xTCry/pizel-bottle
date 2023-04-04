@@ -1,5 +1,6 @@
 import * as WebSocket from 'ws';
 import { LoadingState, MessageType, PixelFlag } from './constants';
+import { pushToFile } from './tools';
 
 import { PixelApi } from './pixel-api.class';
 import { PixelReader } from './pixel-reader.class';
@@ -13,13 +14,13 @@ export class PixelSocket {
   public reader = new PixelReader(this.battleField);
 
   /**
-   * До какого времени (unix) продлена жизнь
+   * После какого времени (unix timestamp) снова может воевать
    */
   private onlineWait: number = 0;
   /**
-   * На сколько мс продляется жизнь
+   * Сколько ms длится перезагрузка на пиксель (ждать 1 минуту)
    */
-  private onlineTtl: number = 30e3;
+  private onlineTtl: number = 60e3;
 
   /**
    * Счетчик промахов
@@ -302,8 +303,23 @@ export class PixelSocket {
       }
 
       case MessageType.MESSAGE_TYPE_PROMOCODE: {
-        const { type: promocodeType, ...rest } = payload.v;
-        this.log.info('Promocode: ', promocodeType, rest);
+        const promocode = payload.v as {
+          type: string;
+          title: string;
+          shortDescription: string;
+          longDescription: string;
+          // "2023-04-15"
+          expiresAt: string;
+          // "XXX-XXX-X0X0-X0X0"
+          value: string;
+          // "https://vk.com/promocode"
+          url: string;
+        };
+        this.log.info('Promocode: ', promocode);
+        pushToFile(
+          'promocode.stat',
+          `${Date.now()}::${this.warrior.userId}::${JSON.stringify(promocode)}`,
+        );
 
         break;
       }
@@ -326,8 +342,7 @@ export class PixelSocket {
     if (online !== undefined) {
       this.battleField.sayOnline(online);
       if (this.warrior.isMainListener) {
-        // TODO: `pushToFile`
-        // statOnline(online);
+        pushToFile('online.stat', `${Date.now()}::${online}`);
       }
     }
 
@@ -394,12 +409,13 @@ export class PixelSocket {
     if (this.battleField.options.healthCheckActive !== false) {
       this.battleField.watchPixel(pixel, this.warrior.userId);
       setTimeout(() => {
+        // Могут быть миссклики, когда область хорошо обороняют
         if (!this.battleField.pingPixel(pixel)) {
           ++this.missesCounter;
           this.log.debug('I am alive? (Pixel not ping)', this.missesCounter);
           this.battleField.unsetPixel(pixel);
 
-          if (this.missesCounter > 3) {
+          if (this.missesCounter > 6) {
             this.log.error('Warrior resigned');
             this.close(true);
             return;
@@ -408,6 +424,8 @@ export class PixelSocket {
           if (true) {
             this.resetWait();
           }
+        } else if (this.missesCounter > 0) {
+          this.missesCounter -= 2;
         }
       }, 10e3);
     }

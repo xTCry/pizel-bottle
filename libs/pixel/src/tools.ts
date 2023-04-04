@@ -1,3 +1,5 @@
+import * as Fs from 'fs-extra';
+
 export const toInt = (val: any, def: number = 0): number => {
   if (typeof val === 'string') {
     return parseInt(val, 10);
@@ -29,6 +31,12 @@ export function toArrayBuffer(buf: any) {
     view[i] = buf[i];
   }
   return ab;
+}
+
+export async function pushToFile(file: string, data: string) {
+  try {
+    await Fs.appendFile(`./dataset/${file}`, `${data}\n`);
+  } catch {}
 }
 
 export function getHexColorFromImage(
