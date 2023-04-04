@@ -167,7 +167,8 @@ export class PixelSocket {
     // * Init load original main field
     if (
       this.warrior.isMainListener &&
-      this.battleField.originalFieldLoadingState === LoadingState.NONE
+      this.battleField.originalFieldLoadingState !== LoadingState.LOADED &&
+      this.battleField.originalFieldLoadingState !== LoadingState.LOADING
     ) {
       this.battleField.loadFieldData(this.warrior).then();
     }

@@ -1,3 +1,4 @@
+import axios from 'axios';
 import {
   BattleState,
   colorIndexDecode,
@@ -9,6 +10,7 @@ import { delay } from './tools';
 import { getLogger } from './logger';
 import { Pixel } from './pixel.class';
 import { Warrior } from './warrior.class';
+import { PixelApi } from './pixel-api.class';
 
 export class BattleField {
   protected readonly logger: Logger;
@@ -70,7 +72,9 @@ export class BattleField {
   public dataUrl: string = null;
 
   public loopDelay: number = 3e3;
+
   private lastSayOnline = 0;
+  private lastUpdateFieldDataTime = 0;
 
   constructor(public readonly options: BattleFieldOptions) {
     this.logger = getLogger(options);
@@ -79,6 +83,15 @@ export class BattleField {
   public async startLoop() {
     const loop = async () => {
       try {
+        if (
+          this.options.autoUpdateField &&
+          Date.now() - this.lastUpdateFieldDataTime > 1 * 60e3 &&
+          this.originalFieldLoadingState !== LoadingState.LOADING &&
+          this.connectedWarriors.size === 0
+        ) {
+          this.loadFieldData().then();
+        }
+
         if (this.battleState !== BattleState.DRAWING) {
           await delay(this.loopDelay);
           setImmediate(loop);
@@ -163,6 +176,7 @@ export class BattleField {
       this.warriors.has(userId) &&
       !this.warriors.get(userId).connected
     ) {
+      this.mainListenerId = null;
       for (const [userId, acc] of this.warriors.entries()) {
         if (acc.connected) {
           this.mainListenerId = userId;
@@ -170,8 +184,9 @@ export class BattleField {
         }
       }
     }
+
     // * Этот активен и он стал главным
-    else if (
+    if (
       userId < this.warriors.size &&
       this.warriors.has(userId) &&
       this.warriors.get(userId).connected
@@ -179,8 +194,9 @@ export class BattleField {
       this.mainListenerId = userId;
       return true;
     }
+
     // * Если ничего не остается как этот
-    else if (
+    if (
       !this.mainListenerId ||
       (this.warriors.has(this.mainListenerId) &&
         !this.warriors.get(this.mainListenerId).connected)
@@ -196,8 +212,9 @@ export class BattleField {
    * Заргузить текущее состояние поля
    * @param warrior От какого Воина делать обращение
    */
-  public async loadFieldData(warrior: Warrior) {
+  public async loadFieldData(warrior?: Warrior) {
     this.originalFieldLoadingState = LoadingState.LOADING;
+    this.lastUpdateFieldDataTime = Date.now();
 
     try {
       this.logger.info(/* .green */ 'Try load original field');
@@ -244,7 +261,7 @@ export class BattleField {
       }
     } catch (err) {
       this.logger.error('Failed laod main field', err);
-      warrior.pixelSocket.reconnect();
+      // warrior?.pixelSocket.reconnect();
       this.originalFieldLoadingState = LoadingState.NONE;
       return false;
     }
@@ -256,16 +273,16 @@ export class BattleField {
   }
 
   private async fetchFieldData(
-    warrior: Warrior,
+    warrior?: Warrior,
     rety: number = 0,
   ): Promise<string> {
     const retryTime = 2;
     const url = `${
-      this.dataUrl
+      this.dataUrl || `${PixelApi.apiUrl}/api/data`
     }?ts=${new Date().getMinutes()}-${new Date().getHours()}`;
 
     try {
-      const response = await warrior.api.get<string>(url);
+      const response = await (warrior ? warrior.api : axios).get<string>(url);
 
       if (response.status !== 200) {
         if (rety < retryTime) {

@@ -20,6 +20,7 @@ import { AppService } from './app.service';
             warriorLogger: createNestLogger('Warrior'),
             logOnlineToConsole: xEnv.USE_LOGGING_ONLINE,
             healthCheckActive: xEnv.USE_HEALTH_CHECK,
+            autoUpdateField: xEnv.USE_AUTO_UPDATE_FIELD,
           },
           optionsTemplateField: {
             logger: createNestLogger('TemplateField'),

@@ -43,3 +43,7 @@ export const USE_LOGGING_ONLINE: boolean = process.env.USE_LOGGING_ONLINE
 export const USE_HEALTH_CHECK: boolean = process.env.USE_HEALTH_CHECK
   ? process.env.USE_HEALTH_CHECK === 'true'
   : false;
+
+export const USE_AUTO_UPDATE_FIELD: boolean = process.env.USE_AUTO_UPDATE_FIELD
+  ? process.env.USE_AUTO_UPDATE_FIELD === 'true'
+  : false;
